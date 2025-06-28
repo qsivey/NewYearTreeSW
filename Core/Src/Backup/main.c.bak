@@ -1,0 +1,588 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2024 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
+#include "main.h"
+#include "dac.h"
+#include "dma.h"
+#include "tim.h"
+#include "gpio.h"
+
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+#include "NewYearTree.h"
+#include "internalFlash.h"
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
+
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
+void SystemClock_Config(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
+
+//#define		NOTE_MUTE				0
+//
+//#define		NOTE_C2					523
+//#define		NOTE_Cd2				554
+//#define		NOTE_D2					587
+//#define		NOTE_Dd2				622
+//#define		NOTE_E2					659
+//#define		NOTE_F2					698
+//#define		NOTE_Fd2				740
+//#define		NOTE_G2					784
+//#define		NOTE_Gd2				831
+//#define		NOTE_A2					880
+//#define		NOTE_Ad2				932
+//#define		NOTE_B2					988
+//
+//#define		NOTE_C3					1046
+//#define		NOTE_Cd3				1109
+//#define		NOTE_D3					1175
+//#define		NOTE_Dd3				1245
+//#define		NOTE_E3					1319
+//#define		NOTE_F3					1397
+//#define		NOTE_Fd3				1480
+//#define		NOTE_G3					1568
+//#define		NOTE_Gd3				1661
+//#define		NOTE_A3					1760
+//#define		NOTE_Ad3				1865
+//#define		NOTE_B3					1976
+//
+//#define		NOTE_C4					2093
+//#define		NOTE_Cd4				2217
+//#define		NOTE_D4					2349
+//#define		NOTE_Dd4				2489
+//#define		NOTE_E4					2637
+//#define		NOTE_F4					2794
+//#define		NOTE_Fd4				2960
+//#define		NOTE_G4					3136
+//#define		NOTE_Gd4				3322
+//#define		NOTE_A4					3520
+//#define		NOTE_Ad4				3729
+//#define		NOTE_B4					3951
+//
+//#define		NOTE_C5					4186
+//#define		NOTE_Cd5				4434
+//#define		NOTE_D5					4699
+//#define		NOTE_Dd5				4978
+//#define		NOTE_E5					5274
+//#define		NOTE_F5					5588
+//#define		NOTE_Fd5				5920
+//#define		NOTE_G5					6270
+//#define		NOTE_Gd5				6645
+//#define		NOTE_A5					7040
+//#define		NOTE_Ad5				7459
+//#define		NOTE_B5					7902
+//
+//
+//ui16 sineWave [SINE_SAMPLES];
+//ui16 sinePointer = 0;
+//static ui8 baseVolume = 9;  // 0 --> 9
+//
+//
+//typedef struct
+//{
+//	ui16	note,
+//			time;
+//
+//}	NYT_Melody_t;
+//
+//const NYT_Melody_t *currentMelody;
+//ui32 currentMelodyDuration = 0;
+//
+//
+//const NYT_Melody_t DarkNecceseties [] =
+//
+//{{		NOTE_Dd5, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_Dd5, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_D5, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_D5, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_C5, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C5, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_Ad4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_Ad4, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_F4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G4, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_Dd4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F4, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_Ad3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C4, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C4, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_F3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_G3, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_Dd3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_F3, 150
+//},{		NOTE_MUTE, 50
+//
+//},{		NOTE_Ad2, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C3, 150
+//},{		NOTE_MUTE, 50
+//},{		NOTE_C3, 150
+//},{		NOTE_MUTE, 50
+//
+//}};
+//
+//static ui32 melodyTime = 0;
+//static ui32 melodyCurrentNote = 0;
+
+
+//void GenerateSineWave (ui16 divider)
+//{
+//    for (ui8 i = 0; i < SINE_SAMPLES; i++)
+//        sineWave[i] = (((ui16)((sin(2 * M_PI * i / SINE_SAMPLES) + 1.0f) * 2047)) / divider);
+//}
+
+
+
+/* USER CODE END 0 */
+
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+  /* USER CODE BEGIN 1 */
+
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_DAC1_Init();
+  MX_TIM1_Init();
+  MX_TIM6_Init();
+  MX_TIM3_Init();
+  /* USER CODE BEGIN 2 */
+
+	extern NewYearTree_t NewYearTree;
+	extern NewYearTreeSettings_t NewYearTreeSettings;
+
+	// read
+
+	NewYearTree.saturation = NYT_INITIAL_SATURATION;
+	NewYearTree.brightness = NYT_INITIAL_BRIGHTNESS;
+	NewYearTree.speed = NYT_INITIAL_SPEED;
+
+	NewYearTree.mode = NYTM_AUTO_RGB;
+	NewYearTree.staticColorState = NYTSCS_NOT;
+	NewYearTree.switchFlag = 0;
+
+	for (ui8 i = 0; i < 8; i++)
+		NewYearTree.starBrightnessLevels[i] = (i * 36) + 3;
+
+	for (ui8 i = 0; i < 8; i++)
+		NewYearTree.starBrightnessLevels[i] = (ui8)roundf(255.0f * powf((float)NewYearTree.starBrightnessLevels[i] / 255.0f, NYT_BRIGHTNESS_CURVE));
+
+	for (ui8 i = 0; i < 8; i++)
+		NewYearTree.delayArray[i] = pow(NYT_MODES_DELAY_CORE, i);
+
+	NewYearTree.modes[0] = NYT_LED_Mode1;
+	NewYearTree.modes[1] = NYT_LED_Mode2;
+	NewYearTree.modes[2] = NYT_LED_Mode3;
+	NewYearTree.modes[3] = NYT_LED_Mode4;
+	NewYearTree.modes[4] = NYT_LED_Mode5;
+	NewYearTree.modes[5] = NYT_LED_Mode6;
+	NewYearTree.modes[6] = NYT_LED_Mode7;
+	NewYearTree.modes[7] = NYT_LED_Mode8;
+	NewYearTree.modes[8] = NYT_LED_Mode9;
+	NewYearTree.modes[9] = NYT_LED_Mode10;
+	NewYearTree.modes[10] = NYT_LED_Mode11;
+	NewYearTree.modes[11] = NYT_LED_Mode12;
+
+	/* Turn off all LEDs */
+	NYT_LED_ClearAll();
+
+	/* Turn on the star */
+	HAL_TIM_Base_Start_IT(&htim3);
+
+    while (1)
+    {
+    	/* State machine */
+    	switch (NewYearTree.mode)
+    	{
+			case NYTM_AUTO_RGB :
+			{
+				for (ui8 i = 0; i < 2; i++)
+					NYT_LED_Mode1();
+
+				for (ui8 i = 0; i < 3; i++)
+					NYT_LED_Mode2();
+
+				for (ui8 i = 0; i < 8; i++)
+					NYT_LED_Mode3();
+
+				for (ui8 i = 0; i < 2; i++)
+					NYT_LED_Mode4();
+
+				for (ui8 i = 0; i < 24; i++)
+					NYT_LED_Mode11();
+
+				for (ui8 i = 0; i < 2; i++)
+					NYT_LED_Mode5();
+
+				NYT_LED_ClearAll();
+				for (ui8 i = 0; i < 12; i++)
+					NYT_LED_Mode7();
+
+				for (ui8 i = 0; i < 24; i++)
+					NYT_LED_Mode8();
+
+				for (ui8 i = 0; i < 2; i++)
+					NYT_LED_Mode6();
+
+				for (ui8 i = 0; i < 24; i++)
+					NYT_LED_Mode10();
+
+				break;
+			}
+
+			case NYTM_MANUAL_RGB_1 :		NYT_LED_Mode1();			break;
+			case NYTM_MANUAL_RGB_2 :		NYT_LED_Mode2();			break;
+			case NYTM_MANUAL_RGB_3 :		NYT_LED_Mode3();			break;
+			case NYTM_MANUAL_RGB_4 :		NYT_LED_Mode4();			break;
+			case NYTM_MANUAL_RGB_5 :		NYT_LED_Mode5();			break;
+			case NYTM_MANUAL_RGB_6 :		NYT_LED_Mode6();			break;
+			case NYTM_MANUAL_RGB_7 :		NYT_LED_Mode7();			break;
+			case NYTM_MANUAL_RGB_8 :		NYT_LED_Mode8();			break;
+			case NYTM_MANUAL_RGB_9 :		NYT_LED_Mode9();			break;
+			case NYTM_MANUAL_RGB_10 :		NYT_LED_Mode10();			break;
+			case NYTM_MANUAL_RGB_11 :		NYT_LED_Mode11();			break;
+			case NYTM_MANUAL_RGB_12 :		NYT_LED_Mode12();			break;
+
+			case NYTM_MANUAL_SC_1 :
+				if (NewYearTree.staticColorState != NYTSCS_RED)
+				{
+					NewYearTree.staticColorState = NYTSCS_RED;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_2 :
+				if (NewYearTree.staticColorState != NYTSCS_YELLOW)
+				{
+					NewYearTree.staticColorState = NYTSCS_YELLOW;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_3 :
+				if (NewYearTree.staticColorState != NYTSCS_GREEN)
+				{
+					NewYearTree.staticColorState = NYTSCS_GREEN;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_4 :
+				if (NewYearTree.staticColorState != NYTSCS_CYAN)
+				{
+					NewYearTree.staticColorState = NYTSCS_CYAN;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_5 :
+				if (NewYearTree.staticColorState != NYTSCS_BLUE)
+				{
+					NewYearTree.staticColorState = NYTSCS_BLUE;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_6 :
+				if (NewYearTree.staticColorState != NYTSCS_MAGENTA)
+				{
+					NewYearTree.staticColorState = NYTSCS_MAGENTA;
+					NYT_LED_ModeSimpleColor();
+				}
+
+				break;
+
+			case NYTM_MANUAL_SC_STAR_ONLY :
+				if (NewYearTree.staticColorState != NYTSCS_ONLY_STAR)
+				{
+					NewYearTree.staticColorState = NYTSCS_ONLY_STAR;
+					NYT_LED_ClearAll();
+				}
+
+				break;
+
+			case NYTM_END_POINTER :
+			{
+				ui8 brightnessTemp = NewYearTree.brightness;
+
+				for (ui8 i = 0; i < 2; i++)
+				{
+					NewYearTree.brightness = 0;
+					HAL_Delay(250);
+
+					NewYearTree.brightness = 7;
+					HAL_Delay(100);
+				}
+
+				NewYearTree.brightness = 0;
+				HAL_Delay(250);
+
+				NewYearTree.brightness = brightnessTemp;
+
+				NewYearTree.mode = NYTM_AUTO_RGB;
+				NewYearTree.staticColorState = NYTSCS_NOT;
+			}
+    	}
+
+
+    	if (NewYearTree.switchFlag)
+    	{
+			/* Reset switching flag */
+			NewYearTree.switchFlag = 0;
+
+			/* Turn off all LEDs */
+			NYT_LED_ClearAll();
+    	}
+    }
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
+}
+
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+}
+
+/* USER CODE BEGIN 4 */
+
+
+//RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+//	RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+//
+//	/** Initializes the RCC Oscillators according to the specified parameters
+//	* in the RCC_OscInitTypeDef structure.
+//	*/
+//
+//	#if (NYT_HSE_RESONATOR)
+//
+//		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+//		RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+//
+//	#else
+//
+//		RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+//		RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+//
+//	#endif
+//
+//	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+//
+//	#if (NYT_HSE_RESONATOR)
+//
+//		RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+//		RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+//
+//	#else
+//
+//		RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+//		RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL12;
+//
+//	#endif
+//
+//	RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+//
+//	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+//		Error_Handler();
+//
+//	/** Initializes the CPU, AHB and APB buses clocks
+//	 */
+//	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+//							  |RCC_CLOCKTYPE_PCLK1;
+//	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+//	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+//	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+//
+//	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+//		Error_Handler();
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
+  /* USER CODE BEGIN Error_Handler_Debug */
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1)
+  {
+  }
+  /* USER CODE END Error_Handler_Debug */
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t *file, uint32_t line)
+{
+  /* USER CODE BEGIN 6 */
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  /* USER CODE END 6 */
+}
+#endif /* USE_FULL_ASSERT */

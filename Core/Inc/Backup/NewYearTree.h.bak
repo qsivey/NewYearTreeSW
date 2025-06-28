@@ -1,0 +1,195 @@
+/** ____________________________________________________________________
+ *
+ * 	@file		NewYearTree.h
+ *
+ *	GitHub:		qsivey
+ *	Telegram:	@qsivey
+ *	Email:		qsivey@gmail.com
+ *	____________________________________________________________________
+ */
+
+#ifndef		INC_NEW_YEAR_TREE_H_
+#define		INC_NEW_YEAR_TREE_H_
+
+/*  = = = = = = = = = = = = = = = = = = = = = = = */
+
+#include	"adjunct.h"
+
+#include	"dac.h"
+#include	"dma.h"
+#include	"tim.h"
+#include	"gpio.h"
+
+
+#define		SINE_SAMPLES			32
+
+#define		NYT_LED_LOGIC_LOW		21
+#define		NYT_LED_LOGIC_HIGH		68
+
+#define		LED_COUNT				16
+#define		LED_RESET_LEN			32
+#define		LED_DATA_LEN			((LED_COUNT * 24) + LED_RESET_LEN)
+
+#define		NYT_HUE_CIRCLE_STEP		60
+
+#define		NYT_HUE_CIRCLE_RED		0
+#define		NYT_HUE_CIRCLE_YELLOW	60
+#define		NYT_HUE_CIRCLE_GREEN	120
+#define		NYT_HUE_CIRCLE_CYAN		180
+#define		NYT_HUE_CIRCLE_BLUE		240
+#define		NYT_HUE_CIRCLE_MAGENTA	300
+
+/* Settings */
+#define		NYT_HSE_RESONATOR		1				// 0 --> 1
+
+#define		NYT_INITIAL_SATURATION	255U			// 0 --> 255
+#define		NYT_INITIAL_BRIGHTNESS	4U				// 0 --> 7
+#define		NYT_INITIAL_SPEED		3U				// 0 --> 7
+
+#define		MAX_SATURATION			255U
+#define		MAX_BRIGHTNESS			255U
+
+#define		NYT_BRIGHTNESS_CURVE	2.0F
+
+#define		NYT_MODES_DELAY_CORE	1.5
+#define		NYT_MODES_SPEED_MP		1.8
+
+#define		NYT_MODE1_CONST_SPEED	60
+#define		NYT_MODE2_CONST_SPEED	750
+#define		NYT_MODE3_CONST_SPEED	0.75
+#define		NYT_MODE4_CONST_SPEED	6
+#define		NYT_MODE5_CONST_SPEED	50
+#define		NYT_MODE6_CONST_SPEED	50
+#define		NYT_MODE7_CONST_SPEED	6
+#define		NYT_MODE8_CONST_SPEED	2000
+#define		NYT_MODE9_CONST_SPEED	100
+#define		NYT_MODE10_CONST_SPEED	250
+#define		NYT_MODE11_CONST_SPEED	250
+#define		NYT_MODE12_CONST_SPEED	50
+
+#define		starTurnON_				HAL_GPIO_WritePin(STAR_GPIO_Port, STAR_Pin, GPIO_PIN_SET)
+#define		starTurnOFF_			HAL_GPIO_WritePin(STAR_GPIO_Port, STAR_Pin, GPIO_PIN_RESET)
+
+#define		nytAssert()				{ if (NewYearTree.switchFlag) return; }
+#define		nytDelay_(x, c)			for (ui32 d = 0; d < ((x) * ((c) * NYT_MODES_SPEED_MP)); d++) nytAssert()
+
+#define		nytSave()				{ NewYearTreeSettings.saturation = NewYearTree.saturation;\
+									  NewYearTreeSettings.brightness = NewYearTree.brightness;\
+									  NewYearTreeSettings.speed = NewYearTree.speed;\
+									  NewYearTreeSettings.mode = NewYearTree.mode;\
+									  NewYearTreeSettings.staticColorState = NewYearTree.staticColorState;\
+									  InternalFlashWriteParameters((__IO ui32*)&NewYearTreeSettings, sizeof(NewYearTreeSettings)); }
+
+
+typedef		void	(*NewYearTreeModeFunc_t)(void);
+
+
+typedef enum
+{
+	NYTM_AUTO_RGB					= 0,
+
+	NYTM_MANUAL_RGB_1,
+	NYTM_MANUAL_RGB_2,
+	NYTM_MANUAL_RGB_3,
+	NYTM_MANUAL_RGB_4,
+	NYTM_MANUAL_RGB_5,
+	NYTM_MANUAL_RGB_6,
+	NYTM_MANUAL_RGB_7,
+	NYTM_MANUAL_RGB_8,
+	NYTM_MANUAL_RGB_9,
+	NYTM_MANUAL_RGB_10,
+	NYTM_MANUAL_RGB_11,
+	NYTM_MANUAL_RGB_12,
+
+	NYTM_MANUAL_SC_1,
+	NYTM_MANUAL_SC_2,
+	NYTM_MANUAL_SC_3,
+	NYTM_MANUAL_SC_4,
+	NYTM_MANUAL_SC_5,
+	NYTM_MANUAL_SC_6,
+	NYTM_MANUAL_SC_STAR_ONLY,
+
+	NYTM_END_POINTER
+
+}	NewYearTreeMode_t;
+
+
+typedef enum
+{
+	NYTSCS_NOT						= 0,
+
+	NYTSCS_RED						= 1,
+	NYTSCS_YELLOW					= 2,
+	NYTSCS_GREEN					= 3,
+	NYTSCS_CYAN						= 4,
+	NYTSCS_BLUE						= 5,
+	NYTSCS_MAGENTA					= 6,
+
+	NYTSCS_ONLY_STAR				= 7,
+
+}	NewYearTreeStaticColorState_t;
+
+
+typedef struct __attribute__((aligned(4)))
+{
+	ui8		ledData [LED_DATA_LEN];
+	ui8		switchFlag;
+
+	ui8		starBrightnessLevels [8];
+	double	delayArray [8];
+
+	/* High-layer fields */
+	ui8		saturation;								// 0 --> 255
+	ui8		brightness;								// 0 --> 7
+	ui8		speed;									// 0 --> 7
+
+	NewYearTreeMode_t		mode;
+	NewYearTreeStaticColorState_t
+							staticColorState;
+
+	/* RGB functions */
+	NewYearTreeModeFunc_t	modes [12];
+
+}	NewYearTree_t;
+
+
+typedef struct __attribute__((aligned(4)))
+{
+	/* High-layer fields */
+	ui8		saturation;
+	ui8		brightness;
+	ui8		speed;
+
+	NewYearTreeMode_t		mode;
+	NewYearTreeStaticColorState_t
+							staticColorState;
+
+}	NewYearTreeSettings_t;
+
+
+void NYT_HSBtoRGB (ui16 hue, ui8 saturation, ui8 brightness, ui8 *red, ui8 *green, ui8 *blue);
+void NYT_HSB256toRGB (ui8 hue, ui8 saturation, ui8 brightness, ui8 *red, ui8 *green, ui8 *blue);
+
+void NYT_LED_SetColor (ui16 ledIndex, ui8 red, ui8 green, ui8 blue);
+void NYT_LED_Update (void);
+void NYT_LED_ClearAll (void);
+
+void NYT_LED_ModeStatic (void);
+void NYT_LED_Mode1 (void);
+void NYT_LED_Mode2 (void);
+void NYT_LED_Mode3 (void);
+void NYT_LED_Mode4 (void);
+void NYT_LED_Mode5 (void);
+void NYT_LED_Mode6 (void);
+void NYT_LED_Mode7 (void);
+void NYT_LED_Mode8 (void);
+void NYT_LED_Mode9 (void);
+void NYT_LED_Mode10 (void);
+void NYT_LED_Mode11 (void);
+void NYT_LED_Mode12 (void);
+
+void NYT_LED_ModeSimpleColor (void);
+
+/*  = = = = = = = = = = = = = = = = = = = = = = = */
+
+#endif		/* INC_NEW_YEAR_TREE_H_ */
